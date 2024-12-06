@@ -1,1 +1,1 @@
-# seqvae
+# SeqVAE
