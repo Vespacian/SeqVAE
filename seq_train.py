@@ -2,6 +2,8 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 
+from model.seqvae import SeqVAE
+
 
 def rand_data(batch_size=256, embed_size=2, seq_length=50):
     """generates random integers to try out while training from 0-100
@@ -12,7 +14,7 @@ def rand_data(batch_size=256, embed_size=2, seq_length=50):
         params (seq_length): how many points to consider per batch
 
     Returns:
-        3D array of integers: shape is (batch_size, embed_size, seq_length)
+        3D array of integers: shape is (batch_size, embed_size, seq_length) - (n, t, m)
             - in other words, for every batch, there will be a 2D array of x,y points for
             seq_length amount of rows
     """
@@ -20,6 +22,7 @@ def rand_data(batch_size=256, embed_size=2, seq_length=50):
     data = np.random.randint(0, 100, (batch_size, seq_length, embed_size))
     return data
 
+# single loss plot
 def plot_loss(loss, num_epochs=50, label="Loss"):
     plt.plot(num_epochs, loss, marker='o', linestyle='-', label=label)
     plt.xlabel('Epochs')
@@ -40,12 +43,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # Hyperparameters
-    batch_size = args.batch_size
-    seq_length = args.seq_length
-    num_epochs = args.num_epochs
+    batch_size = args.batch_size # n
+    seq_length = args.seq_length # t
+    num_epochs = args.num_epochs # m
     
     # load data
     data = rand_data(batch_size=batch_size, seq_length=seq_length)
+    
+    seqvae = SeqVAE(data, batch_size, seq_length)
     
     # start training loop
     for epoch in range(num_epochs):
