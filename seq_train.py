@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 
 from model.seqvae import SeqVAE
 
+from torch.optim import Adam
+
 
 def rand_data(batch_size=256, embed_size=2, seq_length=50):
     """generates random integers to try out while training from 0-100
@@ -52,8 +54,17 @@ if __name__ == "__main__":
     
     seqvae = SeqVAE(data, batch_size, seq_length)
     
+    optimizer = Adam(seqvae, seqvae.learnable_parameters(), args.learning_rate)
+    
+    # optimizer, decoder, coordinates
+    train_step = seqvae.trainer(optimizer, data)
+    validate = seqvae.validater(data)
+    
+    ce_result = []
+    kld_result = []
+    
     # start training loop
     for epoch in range(num_epochs):
-        pass
+        res = train_step(epoch, args.batch_size, args.use_cuda, args.dropout)
     
     plot_loss(0, 0)

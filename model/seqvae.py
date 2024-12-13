@@ -25,7 +25,7 @@ class SeqVAE(nn.Module):
         self.context_to_logvar = nn.Linear(self.params.encoder_rnn_size * 2, self.params.latent_variable_size)
         
     
-    def forward(self, drop_prob, z=None, initial_state=None):
+    def forward(self, drop_prob, coordinates=None):
         """
         :param initial_state: initial state of decoder rnn in order to perform sampling
 
@@ -40,13 +40,16 @@ class SeqVAE(nn.Module):
         return: distribution probabilities with shape (n, t, m)
         """
 
-        if z is None:
-            ''' Get context from encoder and sample z ~ N(mu, std)
-            '''
-            [batch_size, _] = encoder_word_input.size()
+        # embed the input coordinates
+        if coordinates is None:
+            print("need to enter coordinates")
+            return 0, 0, 0
+        else:
+            batch_size, embedding_size, seq_len = coordinates.size()
 
-            encoder_input = self.embedding(encoder_word_input, encoder_character_input)
-
+            # encoder_input = self.embedding(encoder_word_input, encoder_character_input)
+            # flatten input for embedding (n, t, m) -> (n, t x m)
+            encoder_input = self.embedding(coordinates.view(batch_size, -1))
             context = self.encoder(encoder_input)
 
             mu = self.context_to_mu(context)
@@ -63,16 +66,15 @@ class SeqVAE(nn.Module):
 
             # KL divergence loss
             kld = (-0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1)).mean().squeeze()
-        else:
-            kld = None
 
-        decoder_input = self.embedding.word_embed(decoder_word_input)
-        out, final_state = self.decoder(decoder_input, z, drop_prob, initial_state)
+        # decode the latent representation
+        # shape now becomes (batch_size, seq_len, latent_variable_size)
+        decoder_input = z.unsqueeze(1).repeat(1, seq_len, 1)
+        out, final_state = self.decoder(decoder_input, z, drop_prob)
 
         return out, final_state, kld
 
     def learnable_parameters(self):
-
         # word_embedding is constant parameter thus it must be dropped from list of parameters for optimizer
         return [p for p in self.parameters() if p.requires_grad]
 
@@ -113,6 +115,7 @@ class SeqVAE(nn.Module):
 
             [encoder_word_input, encoder_character_input, decoder_word_input, decoder_character_input, target] = input
 
+            # change constructor
             logits, _, kld = self(0.,
                                   encoder_word_input, encoder_character_input,
                                   decoder_word_input, decoder_character_input,
