@@ -23,9 +23,6 @@ class CoordinateDataset(Dataset):
     
     def __getitem__(self, idx):
         return torch.tensor(self.data[idx], dtype=torch.float32)
-    
-
-
 
 # -----------------------
 # Encoder and Decoder
@@ -109,12 +106,16 @@ def vae_loss(recon, x, mean, log_var):
 # -----------------------
 # Training the seqVAE
 # -----------------------
-hidden_dim = 512
-latent_dim = 256
-batch_size = 128
-epochs = 1
 
+# Hypterparameters
+hidden_dim = 1024
+latent_dim = 512
+batch_size = 128
+epochs = 40
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = SeqVAE(input_dim=M, hidden_dim=hidden_dim, latent_dim=latent_dim, seq_length=T)
+model.to(device)
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
 model.train()
@@ -123,8 +124,11 @@ batch_losses = []
 for epoch in range(epochs):
     data = np.random.rand(N, T, M).astype(np.float32)
     dataset = CoordinateDataset(data)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
+    
     for batch in dataloader:
+        batch = batch.to(device)
+        
         optimizer.zero_grad()
         out, mean, log_var = model(batch)
         loss, rl, kl = vae_loss(out, batch, mean, log_var)
@@ -135,12 +139,16 @@ for epoch in range(epochs):
     losses.append(loss.item())
 
 plt.plot(np.arange(epochs), losses)
-plt.title(f"epochs by losses: h{hidden_dim}, l{latent_dim}, bs{batch_size}, e{epochs}")
+plt.title(f"epochs losses: h-{hidden_dim}, l-{latent_dim}, bs-{batch_size}, e-{epochs}")
+plt.xlabel("epochs")
+plt.ylabel("losses")
 plt.savefig("epochs_losses.png")
 plt.close()
 
 plt.plot(batch_losses)
-plt.title(f"batch_losses: h{hidden_dim}, l{latent_dim}, bs{batch_size}, e{epochs}")
+plt.title(f"batch losses: h-{hidden_dim}, l-{latent_dim}, bs-{batch_size}, e-{epochs}")
+plt.xlabel("batches")
+plt.ylabel("losses")
 plt.savefig("batch_losses.png")
 plt.close()
 
@@ -174,7 +182,7 @@ for i, seq in enumerate(sampled_sequences_np):
     ax.scatter(x, y, marker='o', label=f"Sample {i+1}")
 
 # Optionally, add grid, legend, etc.
-ax.set_title(f"Sampled Sequences from SeqVAE h{hidden_dim}, l{latent_dim}, bs{batch_size}, e{epochs}")
+ax.set_title(f"Sampled Sequences from SeqVAE h-{hidden_dim}, l-{latent_dim}, bs-{batch_size}, e-{epochs}")
 ax.set_xlabel("X coordinate")
 ax.set_ylabel("Y coordinate")
 ax.grid(True)
