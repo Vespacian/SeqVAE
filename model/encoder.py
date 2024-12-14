@@ -1,43 +1,17 @@
 import torch.nn as nn
 
-class Encoder:
-    def __init__(self, params):
-        super(Encoder, self).__init__()
-
-        self.params = params
-
-        # TODO: change parameters
-        self.rnn = nn.LSTM(input_size=self.params.word_embed_size + self.params.sum_depth,
-                           hidden_size=self.params.encoder_rnn_size,
-                           num_layers=self.params.encoder_num_layers,
-                           batch_first=True,
-                           bidirectional=True)
+class Encoder(nn.Module):
+    def __init__(self, input_dim=2, hidden_dim=32, latent_dim=16):
+        super().__init__()
+        self.lstm = nn.LSTM(input_dim, hidden_dim, batch_first=True)
+        self.mean_fc = nn.Linear(hidden_dim, latent_dim)
+        self.log_var_fc = nn.Linear(hidden_dim, latent_dim)
         
-        # self.hw1 = Highway(self.params.sum_depth + self.params.word_embed_size, 2, F.relu)
-    
-    def forward(self, input):
-        """
-        :param input: [batch_size, seq_len, embed_size] tensor
-        :return: context of input sentenses with shape of [batch_size, latent_variable_size]
-        """
-
-        pass 
-        # [batch_size, seq_len, embed_size] = input.size()
-
-        # input = input.view(-1, embed_size)
-        # input = self.hw1(input)
-        # input = input.view(batch_size, seq_len, embed_size)
-
-        # assert parameters_allocation_check(self), \
-        #     'Invalid CUDA options. Parameters should be allocated in the same memory'
-
-        # ''' Unfold rnn with zero initial state and get its final state from the last layer
-        # '''
-        # _, (_, final_state) = self.rnn(input)
-
-        # final_state = final_state.view(self.params.encoder_num_layers, 2, batch_size, self.params.encoder_rnn_size)
-        # final_state = final_state[-1]
-        # h_1, h_2 = final_state[0], final_state[1]
-        # final_state = t.cat([h_1, h_2], 1)
-
-        # return final_state
+    def forward(self, x):
+        # x: (B, T, input_dim)
+        _, (h_n, _) = self.lstm(x)
+        h_n = h_n.squeeze(0)  # (B, hidden_dim)
+        
+        mean = self.mean_fc(h_n)      # (B, latent_dim)
+        log_var = self.log_var_fc(h_n) # (B, latent_dim)
+        return mean, log_var

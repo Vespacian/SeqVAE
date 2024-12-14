@@ -1,5 +1,9 @@
+import torch
 
-# trying this out
-def kld_coef(i):
-    import math
-    return (math.tanh((i - 3500)/1000) + 1)/2
+# -----------------------
+# Loss function for VAE
+# -----------------------
+def vae_loss(recon, x, mean, log_var):
+    recon_loss = ((recon - x)**2).mean()
+    kl_div = -0.5 * torch.mean(1 + log_var - mean.pow(2) - log_var.exp())
+    return recon_loss + 0 * kl_div, recon_loss, kl_div

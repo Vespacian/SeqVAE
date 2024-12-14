@@ -1,49 +1,24 @@
 import torch.nn as nn
+import torch.nn.functional as F
 
-class Decoder:
-    def __init__(self, params):
-        super(Decoder, self).__init__()
-
-        self.params = params
-
-        # TODO: change parameters
-        self.rnn = nn.LSTM(input_size=self.params.latent_variable_size + self.params.word_embed_size,
-                           hidden_size=self.params.decoder_rnn_size,
-                           num_layers=self.params.decoder_num_layers,
-                           batch_first=True)
-
-        # self.fc = nn.Linear(self.params.decoder_rnn_size, self.params.word_vocab_size)
-    
-    def forward(self, decoder_input, z, drop_prob, initial_state=None):
-        """
-        :param decoder_input: tensor with shape of [batch_size, seq_len, embed_size]
-        :param z: sequence context with shape of [batch_size, latent_variable_size]
-        :param drop_prob: probability of an element of decoder input to be zeroed in sense of dropout
-        :param initial_state: initial state of decoder rnn
-
-        :return: unnormalized logits of sentense words distribution probabilities
-                    with shape of [batch_size, seq_len, word_vocab_size]
-                 final rnn state with shape of [num_layers, batch_size, decoder_rnn_size]
-        """
-        pass
-
-        # assert parameters_allocation_check(self), \
-        #     'Invalid CUDA options. Parameters should be allocated in the same memory'
-
-        # [batch_size, seq_len, _] = decoder_input.size()
-
-        # '''
-        #     decoder rnn is conditioned on context via additional bias = W_cond * z to every input token
-        # '''
-        # decoder_input = F.dropout(decoder_input, drop_prob)
-
-        # z = t.cat([z] * seq_len, 1).view(batch_size, seq_len, self.params.latent_variable_size)
-        # decoder_input = t.cat([decoder_input, z], 2)
-
-        # rnn_out, final_state = self.rnn(decoder_input, initial_state)
-
-        # rnn_out = rnn_out.contiguous().view(-1, self.params.decoder_rnn_size)
-        # result = self.fc(rnn_out)
-        # result = result.view(batch_size, seq_len, self.params.word_vocab_size)
-
-        # return result, final_state
+class Decoder(nn.Module):
+    def __init__(self, latent_dim=16, hidden_dim=32, output_dim=2, seq_length=50):
+        super().__init__()
+        self.seq_length = seq_length
+        self.lstm = nn.LSTM(latent_dim, hidden_dim, batch_first=True)
+        self.fc_out = nn.Linear(hidden_dim, output_dim)
+        
+    def forward(self, z, seq_length=None, drop_prob=0.3):
+        if seq_length is None:
+            seq_length = self.seq_length
+        
+        z = F.dropout(z, drop_prob)
+        
+        # z: (B, latent_dim)
+        # Repeat z for each time step: (B, T, latent_dim)
+        z_expanded = z.unsqueeze(1).repeat(1, seq_length, 1)
+        
+        h, _ = self.lstm(z_expanded)
+        # h: (B, T, hidden_dim)
+        out = self.fc_out(h)  # (B, T, output_dim)
+        return out
