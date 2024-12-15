@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
 
-from model.coord_dataset import CoordinateDataset
+from utils.coord_dataset import CoordinateDataset
 from model.seqvae import SeqVAE
 from utils.functions import vae_loss
 
@@ -60,19 +60,34 @@ def sampling():
     plt.savefig("sampled_seqs.png")
     plt.close()
 
+# expects np array
+# expected elements: epochs, loss val, recon loss, kl div
+def plot_progress(progress):
+    plt.plot(progress[:, 0], progress[:, 1], label='Total loss', marker='o')
+    plt.plot(progress[:, 0], progress[:, 2], label='Recon loss', marker='o')
+    plt.plot(progress[:, 0], progress[:, 3], label='KL Div', marker='o')
+    
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.title('Progress')
+    plt.legend()
+    plt.grid(True)
+    
+    plt.savefig("progress.png")
+    plt.close()
 
 
-# ______________________________________________________________
-# Generate Synthetic Data
+# _______________________________________________________________________________________________________
+# Dims for generating random data
 N = 65536  # number of sequences
 T = 50    # sequence length
 M = 2     # features (x,y)
 
 # Hypterparameters
-hidden_dim = 1024
-latent_dim = 512
+hidden_dim = 512
+latent_dim = 1024
 batch_size = 128
-epochs = 10
+epochs = 2
 
 # init model
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -84,7 +99,9 @@ optimizer = optim.Adam(model.parameters(), lr=1e-3)
 model.train()
 losses = []
 batch_losses = []
+progress = []
 for epoch in range(epochs):
+    # testing with random data
     data = np.random.rand(N, T, M).astype(np.float32)
     dataset = CoordinateDataset(data)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
@@ -94,15 +111,17 @@ for epoch in range(epochs):
         
         optimizer.zero_grad()
         out, mean, log_var = model(batch)
-        loss, rl, kl = vae_loss(out, batch, mean, log_var)
+        loss, rl, kl = vae_loss(out, batch, mean, log_var, epoch)
         loss.backward()
         optimizer.step()
         batch_losses.append(loss.item())
     
+    progress.append((epoch+1, loss.item(), rl.item(), kl.item()))
     print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}, Recon: {rl.item():.4f}, KL: {kl.item():.4f}")
     losses.append(loss.item())
 
 # Plotting results
+plot_progress(np.array(progress))
 plot_losses(hidden_dim, latent_dim, epochs, losses, batch_losses)
 sampling()
 
