@@ -10,14 +10,10 @@ pip install -r requirements.txt
 
 ## Training
 
-To run the program, run `seq_train.py`. We currently have 3 explicit parameters: 
-- --batch-size: how many batches to run (default: 256)
-- --seq-length: how long each sequence should be (default: 50)
-- --num-epochs: how many epochs to run (default: 10)
+To start training, run `train.py`. Run `python train.py --help` for a full list of customizable options.
 
 Example command:
 
 ```
-python seq_train.py --batch-size 512 --seq-length 75 --num-epochs 15
+python train.py --epoch_size 65536 --batch_size 256 --latent_dim 256 --hidden_dim 1024 --num_epochs 150
 ```
-

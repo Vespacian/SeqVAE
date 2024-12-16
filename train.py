@@ -101,7 +101,7 @@ def run(opts):
         print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}, Recon: {rl.item():.4f}, KL: {kl.item():.4f}")
 
     # Plotting results
-    plot_losses(np.array(losses), opts)
+    plot_losses(losses, opts)
     plot_samples(model, opts)
     print("Training complete and plots saved")
 
