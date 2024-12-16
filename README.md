@@ -20,6 +20,3 @@ Example command:
 ```
 python train.py --epoch_size 65536 --batch_size 256 --latent_dim 256 --hidden_dim 1024 --num_epochs 150
 ```
-
-
-python train.py --epoch_size 512 --batch_size 32 --latent_dim 16 --hidden_dim 32 --num_epochs 10
