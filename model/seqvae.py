@@ -21,11 +21,11 @@ class SeqVAE(nn.Module):
     def forward(self, x):
         mean, log_var = self.encoder(x)
         z = self.reparameterize(mean, log_var)
-        out = self.decoder(z, seq_length=x.shape[1])
+        out = self.decoder(z, seq_length=x.shape[1], drop_prob=0.3)
         return out, mean, log_var
     
     def sample(self, num_samples, seq_length=None, device='cpu'):
         z = torch.randn(num_samples, self.latent_dim).to(device)
         with torch.no_grad():
-            generated = self.decoder(z, seq_length=seq_length)
+            generated = self.decoder(z, seq_length=seq_length, drop_prob=0)
         return generated

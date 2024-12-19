@@ -70,7 +70,7 @@ def run(opts):
     # Define model
     model = SeqVAE(input_dim=opts.element_dim, hidden_dim=opts.hidden_dim, latent_dim=opts.latent_dim, seq_length=opts.graph_size)
     model.to(opts.device)
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=0.01)
 
     # Training loop start
     model.train()
