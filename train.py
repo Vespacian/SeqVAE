@@ -82,9 +82,17 @@ def run(opts):
     for epoch in range(opts.num_epochs):
         # Train with uniform random data
         data = np.random.rand(opts.epoch_size, opts.graph_size, opts.element_dim).astype(np.float32)
-        dataset = CoordinateDataset(data)
-        dataloader = DataLoader(dataset, batch_size=opts.batch_size, shuffle=True, pin_memory=True)
         
+        # sorting data by increasing values of x
+        sorted_indicies = np.argsort(data[:, :, 0], axis=1)
+        sorted_data = np.take_along_axis(data, sorted_indicies[:, :, None], axis=1)
+        
+        # confirm data was sorted properly
+        x_vals = sorted_data[:, :, 0] 
+        assert np.all(np.diff(x_vals, axis=1) >= 0), "x values are not sorted in non decreasing order"
+        
+        dataset = CoordinateDataset(sorted_data)
+        dataloader = DataLoader(dataset, batch_size=opts.batch_size, shuffle=True, pin_memory=True)
         for batch in dataloader:
             batch = batch.to(opts.device)
             

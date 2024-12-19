@@ -8,7 +8,7 @@ class Decoder(nn.Module):
         self.lstm = nn.LSTM(latent_dim, hidden_dim, batch_first=True)
         self.fc_out = nn.Linear(hidden_dim, output_dim)
         
-    def forward(self, z, seq_length=None, drop_prob=0.3):
+    def forward(self, z, seq_length=None, drop_prob=0): # drop prob used to be 0.3
         if seq_length is None:
             seq_length = self.seq_length
         
