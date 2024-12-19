@@ -10,6 +10,7 @@ from utils.dataset import CoordinateDataset
 from model.seqvae import SeqVAE
 from utils.functions import vae_loss
 from utils.options import get_options
+from utils.distributions import gaussian_mixture_batch
 
 
 # Utility function for plotting
@@ -79,13 +80,21 @@ def run(opts):
         'recon': [],
         'kl': []
     }
+    
     for epoch in range(opts.num_epochs):
         # Train with uniform random data
-        data = np.random.rand(opts.epoch_size, opts.graph_size, opts.element_dim).astype(np.float32)
+        # data = np.random.rand(opts.epoch_size, opts.graph_size, opts.element_dim).astype(np.float32)
+        
+        # from gaussian
+        data = np.zeros((opts.epoch_size, opts.graph_size, opts.element_dim), dtype=np.float32)
+        # for i in range(opts.epoch_size):
+        data = gaussian_mixture_batch(opts.batch_size, opts.graph_size, cdist=50)
+        # print(data[epoch])
         
         # sorting data by increasing values of x
         sorted_indicies = np.argsort(data[:, :, 0], axis=1)
         sorted_data = np.take_along_axis(data, sorted_indicies[:, :, None], axis=1)
+        # print(sorted_data)
         
         # confirm data was sorted properly
         x_vals = sorted_data[:, :, 0] 
