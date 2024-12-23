@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 from utils.dataset import CoordinateDataset
 from model.seqvae import SeqVAE
-from utils.functions import vae_loss, kl_scheduler
+from utils.functions import vae_loss
 from utils.options import get_options
 from utils.distributions import gaussian_mixture_batch
 
