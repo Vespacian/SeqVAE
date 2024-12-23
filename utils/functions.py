@@ -1,10 +1,14 @@
 import torch
 import math
 
-def kl_scheduler(epoch):
-    return 0.5 * (math.tanh((epoch/100) - 2.5) + 1)
+# Scheduling function for weight of KL divergence in loss
+# If max is set to a negative number, it will be ignored
+def kl_scheduler(epoch, max=-1):
+    val = 0.5 * (math.tanh((epoch/200) - 2.5) + 1)
+    return min(max, val) if max >= 0 else val
 
 # Loss function for VAE
+# Returns tuple of (total_loss, recon_loss, kl_loss)
 def vae_loss(recon, x, mean, log_var, epoch):
     recon_loss = ((recon - x)**2).mean()
     kl_div = -0.5 * torch.mean(1 + log_var - mean.pow(2) - log_var.exp())
