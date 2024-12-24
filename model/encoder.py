@@ -1,9 +1,10 @@
 import torch.nn as nn
+import torch.nn.functional as F
 
 class Encoder(nn.Module):
-    def __init__(self, input_dim=2, hidden_dim=32, latent_dim=16):
+    def __init__(self, input_dim=2, hidden_dim=32, latent_dim=16, drop_prob=0.3):
         super().__init__()
-        self.lstm = nn.LSTM(input_dim, hidden_dim, batch_first=True)
+        self.lstm = nn.LSTM(input_dim, hidden_dim, batch_first=True, dropout=drop_prob, num_layers=2)
         self.mean_fc = nn.Linear(hidden_dim, latent_dim)
         self.log_var_fc = nn.Linear(hidden_dim, latent_dim)
         
