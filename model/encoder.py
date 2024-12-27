@@ -13,6 +13,6 @@ class Encoder(nn.Module):
         _, (h_n, _) = self.lstm(x)
         h_n = h_n.squeeze(0)  # (B, hidden_dim)
         
-        mean = self.mean_fc(h_n)      # (B, latent_dim)
-        log_var = self.log_var_fc(h_n) # (B, latent_dim)
+        mean = self.mean_fc(h_n)[-1]        # (B, latent_dim)
+        log_var = self.log_var_fc(h_n)[-1]  # (B, latent_dim)
         return mean, log_var

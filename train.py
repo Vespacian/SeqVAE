@@ -31,7 +31,7 @@ def plot_losses(losses, opts):
     result_dir = os.path.join(opts.result_dir, 'train')
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
-    plt.savefig(os.path.join(result_dir, f'losses_h{opts.hidden_dim}_l{opts.latent_dim}_e{opts.epoch_size}.png'), format='png')
+    plt.savefig(os.path.join(result_dir, f'losses_h{opts.hidden_dim}_l{opts.latent_dim}_b{opts.batch_size}_e{opts.num_epochs}.png'), format='png')
     plt.close()
 
 # Utility function for sampling from the VAE
@@ -60,7 +60,7 @@ def plot_samples(model, opts, num_samples=5):
     result_dir = os.path.join(opts.result_dir, 'train')
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
-    plt.savefig(os.path.join(result_dir, f'samples_h{opts.hidden_dim}_l{opts.latent_dim}_e{opts.epoch_size}.png'), format='png')
+    plt.savefig(os.path.join(result_dir, f'samples_h{opts.hidden_dim}_l{opts.latent_dim}_b{opts.batch_size}_e{opts.num_epochs}.png'), format='png')
     plt.close()
 
 # Main run function
