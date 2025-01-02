@@ -5,7 +5,7 @@ class Decoder(nn.Module):
     def __init__(self, latent_dim=16, hidden_dim=32, output_dim=2, seq_length=50, drop_prob=0.3):
         super().__init__()
         self.seq_length = seq_length
-        self.lstm = nn.LSTM(latent_dim, hidden_dim, batch_first=True, dropout=drop_prob, num_layers=2)
+        self.lstm = nn.LSTM(latent_dim, hidden_dim, batch_first=True, dropout=drop_prob, num_layers=3)
         self.fc_out = nn.Linear(hidden_dim, output_dim)
         
     def forward(self, z, seq_length=None):
