@@ -20,3 +20,9 @@ Example command:
 ```
 python train.py --epoch_size 65536 --batch_size 256 --latent_dim 256 --hidden_dim 1024 --num_epochs 150
 ```
+
+Add the `run_name` and/or `run_timestamp` options to identify the run:
+
+```
+python train.py --run_name myrun --run_timestamp
+```

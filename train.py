@@ -28,10 +28,10 @@ def plot_losses(losses, opts):
     plt.legend()
 
     # Save plot
-    result_dir = os.path.join(opts.result_dir, 'train')
+    result_dir = os.path.join(opts.result_dir, 'plots')
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
-    plt.savefig(os.path.join(result_dir, f'losses_h{opts.hidden_dim}_l{opts.latent_dim}_b{opts.batch_size}_e{opts.num_epochs}.png'), format='png')
+    plt.savefig(os.path.join(result_dir, f'losses_{opts.run_name}.png'), format='png')
     plt.close()
 
 # Utility function for sampling from the VAE
@@ -57,10 +57,10 @@ def plot_samples(model, opts, num_samples=5):
     ax.legend()
 
     # Save plot
-    result_dir = os.path.join(opts.result_dir, 'train')
+    result_dir = os.path.join(opts.result_dir, 'plots')
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
-    plt.savefig(os.path.join(result_dir, f'samples_h{opts.hidden_dim}_l{opts.latent_dim}_b{opts.batch_size}_e{opts.num_epochs}.png'), format='png')
+    plt.savefig(os.path.join(result_dir, f'samples_{opts.run_name}.png'), format='png')
     plt.close()
 
 # Main run function
@@ -115,6 +115,14 @@ def run(opts):
     plot_losses(losses, opts)
     plot_samples(model, opts)
     print("Training complete and plots saved")
+
+    # Save model
+    result_dir = os.path.join(opts.result_dir, 'models')
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
+    model_path = os.path.join(result_dir, f'model_{opts.run_name}.pth')
+    torch.save(model.state_dict(), model_path)
+    print("Model saved")
 
 # Program entrypoint
 if __name__ == "__main__":
