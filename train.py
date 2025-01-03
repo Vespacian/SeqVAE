@@ -82,9 +82,15 @@ def run(opts):
     }
     
     for epoch in range(opts.num_epochs):
-        # Train with uniform random data
-        # data = np.random.rand(opts.epoch_size, opts.graph_size, opts.element_dim).astype(np.float32)
-        data = gaussian_mixture_batch(opts.epoch_size, opts.graph_size, cdist=50)
+        # Train with random data
+        half_epoch = opts.epoch_size // 2
+        data_unif = np.random.rand(half_epoch, opts.graph_size, opts.element_dim).astype(np.float32)
+        data_gaussian = gaussian_mixture_batch(half_epoch, opts.graph_size, cdist=50)
+        data = np.concatenate([data_unif, data_gaussian], axis=0)
+
+        idx = np.arange(opts.epoch_size)
+        np.random.shuffle(idx)
+        data = data[idx]
         
         # sorting data by increasing values of x
         sorted_indicies = np.argsort(data[:, :, 0], axis=1)
