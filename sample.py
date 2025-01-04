@@ -5,7 +5,7 @@ import math
 from model.seqvae import SeqVAE
 
 # Constants, modify for plotting
-MODEL_NAME = 'model_gaussian-model_20250102T213123.pth'
+MODEL_NAME = 'model_gaussian-model-0.7dp_20250103T120759.pth'
 MODEL_PATH = f'results/models/{MODEL_NAME}'
 NUM_SAMPLES = 12
 ELEMENT_DIM = 2
