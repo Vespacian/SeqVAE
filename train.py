@@ -10,7 +10,7 @@ from utils.dataset import CoordinateDataset
 from model.seqvae import SeqVAE
 from utils.functions import vae_loss
 from utils.options import get_options
-from utils.distributions import gaussian_mixture_batch
+from utils.distributions import link_batch
 
 
 # Utility function for plotting
@@ -83,10 +83,11 @@ def run(opts):
     
     for epoch in range(opts.num_epochs):
         # Train with random data
-        half_epoch = opts.epoch_size // 2
-        data_unif = np.random.rand(half_epoch, opts.graph_size, opts.element_dim).astype(np.float32)
-        data_gaussian = gaussian_mixture_batch(half_epoch, opts.graph_size, cdist=50)
-        data = np.concatenate([data_unif, data_gaussian], axis=0)
+        LINK_VALUES = [1, 5, 10, 15]
+        lbatch_size = opts.epoch_size // len(LINK_VALUES)
+        data = np.zeros((opts.epoch_size, opts.graph_size, opts.element_dim))
+        for i, link_size in enumerate(LINK_VALUES):
+            data[i*lbatch_size:(i+1)*lbatch_size] = link_batch(lbatch_size, opts.graph_size, link_size=link_size, noise=0.05)
 
         idx = np.arange(opts.epoch_size)
         np.random.shuffle(idx)
