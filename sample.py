@@ -49,7 +49,7 @@ def plot_samples(model, num_samples=5):
 # Load model and plot
 model = SeqVAE(input_dim=ELEMENT_DIM, hidden_dim=HIDDEN_DIM, latent_dim=LATENT_DIM, seq_length=GRAPH_SIZE)
 model.load_state_dict(torch.load(MODEL_PATH, weights_only=True))
-model.to(DEVICE)
+model = model.to(DEVICE)
 print("Model loaded from:", MODEL_PATH)
 
 plot_samples(model, num_samples=NUM_SAMPLES)

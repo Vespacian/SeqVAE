@@ -70,7 +70,7 @@ def run(opts):
 
     # Define model
     model = SeqVAE(input_dim=opts.element_dim, hidden_dim=opts.hidden_dim, latent_dim=opts.latent_dim, seq_length=opts.graph_size)
-    model.to(opts.device)
+    model = model.to(opts.device)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
     # Training loop start
@@ -128,6 +128,7 @@ def run(opts):
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
     model_path = os.path.join(result_dir, f'model_{opts.run_name}.pth')
+    model = model.cpu()
     torch.save(model.state_dict(), model_path)
     print("Model saved")
 
