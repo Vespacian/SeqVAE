@@ -21,7 +21,7 @@ This file documents lessons learned and trends observed when hyperparameter tuni
 
 ## Regularization and Scheduling
 
-- Dropout value of $p=0.3$ for the encoder and $p=0.5$ for the decoder work fairly well
+- Dropout value of $p=0.3$ for the encoder and $p=0.7$ for the decoder work fairly well
     - Intuition: Higher value for decoder to allow it to be more robust to going OOD during generation
 - Adding slight Gaussian noise to the reconstruction loss performs around the same as not adding noise (or maybe a slight bit better?)
     - We choose to add slight Gaussian noise for sake of correctness; probably gives slight robustness benefits too
