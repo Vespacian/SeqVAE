@@ -5,12 +5,12 @@ import math
 from model.seqvae import SeqVAE
 
 # Constants, modify for plotting
-MODEL_NAME = 'model_gaussian-model-0.7dp_20250103T120759.pth'
+MODEL_NAME = 'model_tuning3_20250109T133656.pth'
 MODEL_PATH = f'results/models/{MODEL_NAME}'
 NUM_SAMPLES = 12
 ELEMENT_DIM = 2
-HIDDEN_DIM = 256
-LATENT_DIM = 1024
+HIDDEN_DIM = 512
+LATENT_DIM = 128
 GRAPH_SIZE = 50
 DEVICE =  torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

@@ -10,8 +10,8 @@ class SeqVAE(nn.Module):
         self.latent_dim = latent_dim
         self.seq_length = seq_length
         
-        self.encoder = Encoder(input_dim, hidden_dim, latent_dim, drop_prob=0.3)
-        self.decoder = Decoder(latent_dim, hidden_dim, input_dim, seq_length, drop_prob=0.7)
+        self.encoder = Encoder(input_dim, hidden_dim, latent_dim, drop_prob=0.1)
+        self.decoder = Decoder(latent_dim, hidden_dim, input_dim, seq_length, drop_prob=0.1)
         
     def reparameterize(self, mean, log_var):
         std = torch.exp(0.5 * log_var)
